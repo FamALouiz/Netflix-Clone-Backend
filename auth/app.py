@@ -1,7 +1,7 @@
 from flask import request
 from flask_restx import Namespace, Resource, fields
 
-from models import User
+from models import User, Profile
 
 auth_ns = Namespace('auth', description='Authentication related operations')
 
@@ -50,13 +50,22 @@ class RegisterResource(Resource):
             return {'message': 'User already exists'}, 400
         
         # Create new user
+        
         new_user = User(
             email=data['email'],
             password=data['password'],
+        )
+    
+        new_user.save()
+    
+        new_first_profile = Profile(
             first_name=data['firstName'],
-            last_name=data['lastName']
+            last_name=data['lastName'],
+            user_id = new_user.id
         )
         
-        new_user.save()
+        new_first_profile.save()
+        
+        new_user.update(profile_to_be_added=new_first_profile)
         
         return {'message': 'User created successfully'}, 201
