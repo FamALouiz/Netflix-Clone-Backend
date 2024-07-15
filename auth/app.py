@@ -34,7 +34,7 @@ class LoginResource(Resource):
             return {'message': 'Invalid credentials'}, 401
         
         # Successful login
-        return {'message': 'Login successful'}, 200
+        return {'message': 'Login successful', 'userId': user.id}, 200
 
 @auth_ns.route('/register')
 class RegisterResource(Resource): 
