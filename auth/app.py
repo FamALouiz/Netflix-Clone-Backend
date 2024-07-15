@@ -22,8 +22,8 @@ class LoginResource(Resource):
     
     @auth_ns.expect(login_model)
     def post(self):
-        data = request.get_json()
-        user = User.query.filter_by(email=data['email']).first()
+        data = request.get_json()['body']
+        user = User.query.filter_by(email=data.get('email')).first()
         
         # Check if user exists
         if user is None: 
