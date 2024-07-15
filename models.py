@@ -8,7 +8,7 @@ class User(db.Model):
     profiles = db.relationship('Profile', backref='user', lazy=True)
 
     def __repr__(self) -> str:
-        return f'<User {self.email}>'
+        return f'<User {self.id} {self.email}>'
     
     def save(self) -> None: 
         db.session.add(self)
@@ -21,7 +21,7 @@ class User(db.Model):
     def update(self, email=None, password=None, profile_to_be_added=None) -> None: 
         self.email = email if email is not None else self.email
         self.password = password if password is not None else self.password
-        self.profiles.append(profile_to_be_added) if profile_to_be_added is not None else self.profiles
+        if profile_to_be_added is not None: self.profiles.append(profile_to_be_added) 
         db.session.commit()
         
 class Profile(db.Model): 
@@ -41,7 +41,8 @@ class Profile(db.Model):
         db.session.delete(self)
         db.session.commit()
         
-    def update(self, first_name=None, last_name=None) -> None:
+    def update(self, first_name=None, last_name=None, user_id=None) -> None:
         self.first_name = first_name if first_name is not None else self.first_name
         self.last_name = last_name if last_name is not None else self.last_name
+        self.user_id = user_id if user_id is not None else self.user_id
         db.session.commit()

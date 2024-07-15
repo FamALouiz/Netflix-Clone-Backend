@@ -50,7 +50,6 @@ class RegisterResource(Resource):
             return {'message': 'User already exists'}, 400
         
         # Create new user
-        
         new_user = User(
             email=data['email'],
             password=data['password'],

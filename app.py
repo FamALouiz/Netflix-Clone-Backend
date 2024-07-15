@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_restx import Api
 
 from auth.app import auth_ns
+from profiles.app import profile_ns
 from config import DevConfig
 from instances import db
 
@@ -15,7 +16,9 @@ CORS(app)
 
 api = Api(app, doc='/doc', title='Netlix Clone API', version='1.0')
 
+# Register namespaces
 api.add_namespace(auth_ns)
+api.add_namespace(profile_ns)
 
 with app.app_context() as context: 
     db.init_app(app)
