@@ -50,7 +50,7 @@ class MoviesResource(Resource):
         except Exception as e: 
             return {'message': str(e)}, 404
     
-@movies_ns.route("/genres/")
+@movies_ns.route('/genres/')
 class GenresResource(Resource): 
         
         @movies_ns.marshal_list_with(genre_model)
@@ -72,6 +72,13 @@ class GenresResource(Resource):
             except Exception as e: 
                 return {'message': str(e)}, 404
 
+@movies_ns.route('/genre/<int:id>')    
+class GenreResource(Resource): 
+    
+    @movies_ns.marshal_with(genre_model)
+    def get(self, id): 
+        genre = Genre.query.get_or_404(id)
+        return genre, 200
     
 @movie_ns.route('/<int:id>')
 class MovieResource(Resource): 
