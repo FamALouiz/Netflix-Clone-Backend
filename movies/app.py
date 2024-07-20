@@ -1,7 +1,7 @@
 from flask import request
 from flask_restx import Namespace, Resource, fields
 
-from .models import Movie
+from .models import Movie, Genre
 
 movies_ns = Namespace('movies', description='Movies related operations')
 
@@ -13,7 +13,7 @@ movie_model = movie_ns.model('Movie', {
     'video_url': fields.String(required=True, description='The movie video url'),
     'thumbnail_url': fields.String(required=True, description='The movie thumbnail url'),
     'duration_in_minutes': fields.Integer(required=True, description='The movie duration in minutes'),
-    'genre_id': fields.Integer(required=True, description='The genre id')
+    'genre': fields.String(required=True, description='The movie genre', attribute='genre.name'),
 })
 
 @movies_ns.route('/')
@@ -33,12 +33,16 @@ class MoviesResource(Resource):
         video_url = data['video_url']
         thumbnail_url = data['thumbnail_url']
         duration_in_minutes = data['duration_in_minutes']
-        genre_id = data['genre_id']
+        genre_name = data['genre']
         
-        movie = Movie(title=title, description=description, video_url=video_url, thumbnail_url=thumbnail_url, duration_in_minutes=duration_in_minutes, genre_id=genre_id)
-        movie.save()
-        
-        return movie, 201
+        try: 
+            genre = Genre.query.filter_by(name=genre_name).first()
+            movie = Movie(title=title, description=description, video_url=video_url, thumbnail_url=thumbnail_url, duration_in_minutes=duration_in_minutes, genre_id=genre.id)
+            movie.save()
+            
+            return movie, 201
+        except Exception as e: 
+            return {'message': str(e)}, 404
     
 @movie_ns.route('/<int:id>')
 class MovieResource(Resource): 
