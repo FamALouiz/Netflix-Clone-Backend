@@ -1,12 +1,12 @@
 from instances import db
-
+from favorites.models import Favorite
 # User model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     profiles = db.relationship('Profile', backref='user', lazy=True)
-    favorites = db.relationship('Movie', secondary='favorite', backref='users', lazy=True)
+    favorites = db.relationship('Favorite', backref='users', lazy=True)
 
     def __repr__(self) -> str:
         return f'<User {self.id} {self.email}>'
@@ -23,7 +23,16 @@ class User(db.Model):
         self.email = email if email is not None else self.email
         self.password = password if password is not None else self.password
         if profile_to_be_added is not None: self.profiles.append(profile_to_be_added) 
-        if favorite_to_be_added is not None: self.favorites.append(favorite_to_be_added)
+        if favorite_to_be_added is not None: 
+            movie_ids = [favorite.movie_id for favorite in self.favorites]
+            if int(favorite_to_be_added) not in movie_ids:
+                new_favorite = Favorite(user_id=self.id, movie_id=favorite_to_be_added)
+                new_favorite.save()
+                self.favorites.append(new_favorite.id)
+            else:
+                Favorite.query.filter_by(user_id=self.id, movie_id=favorite_to_be_added).delete()
+                self.favorites = [favorite for favorite in self.favorites if favorite.movie_id != favorite_to_be_added]
+                
         db.session.commit()
         
 class Profile(db.Model): 
