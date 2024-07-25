@@ -5,22 +5,29 @@ from movies.models import Movie
 
 favorites_ns = Namespace('favorites', description='Favorites related operations')
 
-favorite_model = favorites_ns.model('Favorite', {
-    'movie_id': fields.Integer(required=True, description='The movie id'),
-    'user_id': fields.Integer(required=True, description='The user id')
-})
-
 @favorites_ns.route('/<int:user_id>')
 class FavoritesResource(Resource):
     
-    @favorites_ns.expect(favorite_model)
-    def put(self, user_id):        
+    def get(self, user_id):
+        user = User.query.get_or_404(user_id)
+        return {'favorites': [favorite.movie_id for favorite in user.favorites]}
+    
+    def put(self, user_id):  
+        
         movie_id = request.args.get('movieId')
         
+        if movie_id is None: 
+            return {'message': 'movieId is required'}, 400        
+                    
         # Check if user is valid
         user = User.query.get_or_404(user_id)
         
         # Check if movie is valid 
-        movie = Movie.query.get_or_404(movie_id)
+        movie = Movie.query.get(movie_id)
+
+        if movie is None:
+            return {'message': 'Invalid movieId'}, 400
+        
         user.update(favorite_to_be_added=movie_id)
-        return None, 200
+        
+        return {'message': 'Favorites updated'}, 200
