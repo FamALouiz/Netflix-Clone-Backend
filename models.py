@@ -6,6 +6,7 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     profiles = db.relationship('Profile', backref='user', lazy=True)
+    favorites = db.relationship('Movie', secondary='favorite', backref='users', lazy=True)
 
     def __repr__(self) -> str:
         return f'<User {self.id} {self.email}>'
@@ -18,10 +19,11 @@ class User(db.Model):
         db.session.delete(self)
         db.session.commit()
         
-    def update(self, email=None, password=None, profile_to_be_added=None) -> None: 
+    def update(self, email=None, password=None, profile_to_be_added=None, favorite_to_be_added=None) -> None: 
         self.email = email if email is not None else self.email
         self.password = password if password is not None else self.password
         if profile_to_be_added is not None: self.profiles.append(profile_to_be_added) 
+        if favorite_to_be_added is not None: self.favorites.append(favorite_to_be_added)
         db.session.commit()
         
 class Profile(db.Model): 
