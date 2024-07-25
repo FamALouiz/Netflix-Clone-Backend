@@ -28,7 +28,7 @@ class User(db.Model):
             if int(favorite_to_be_added) not in movie_ids:
                 new_favorite = Favorite(user_id=self.id, movie_id=favorite_to_be_added)
                 new_favorite.save()
-                self.favorites.append(new_favorite.id)
+                self.favorites.append(new_favorite)
             else:
                 Favorite.query.filter_by(user_id=self.id, movie_id=favorite_to_be_added).delete()
                 self.favorites = [favorite for favorite in self.favorites if favorite.movie_id != favorite_to_be_added]
