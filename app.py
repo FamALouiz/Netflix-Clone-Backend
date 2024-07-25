@@ -8,6 +8,7 @@ from config import DevConfig
 from instances import db
 from movies.app import movie_ns, movies_ns
 from profiles.app import profile_ns
+from favorites.app import favorites_ns
 
 app = Flask(__name__)
 
@@ -22,6 +23,7 @@ api.add_namespace(auth_ns)
 api.add_namespace(profile_ns)
 api.add_namespace(movies_ns)
 api.add_namespace(movie_ns)
+api.add_namespace(favorites_ns)
 
 with app.app_context() as context: 
     db.init_app(app)
